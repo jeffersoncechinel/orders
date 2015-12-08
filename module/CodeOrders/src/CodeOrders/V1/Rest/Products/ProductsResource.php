@@ -5,15 +5,18 @@ use Herrera\Json\Exception\Exception;
 use Zend\Stdlib\Hydrator\ObjectProperty;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Rest\AbstractResourceListener;
+use CodeOrders\V1\Rest\Users\UsersRepository;
 
 class ProductsResource extends AbstractResourceListener
 {
 
     private $repository;
+    private $usersRepository;
 
-    public function __construct(ProductsRepository $repository)
+    public function __construct(ProductsRepository $repository, UsersRepository $usersRepository)
     {
         $this->repository = $repository;
+        $this->usersRepository = $usersRepository;
     }
 
     /**
@@ -24,6 +27,11 @@ class ProductsResource extends AbstractResourceListener
      */
     public function create($data)
     {
+        $user = $this->usersRepository->findByUsername($this->getIdentity()->getRoleId());
+        if ($user->getRole() != "admin") {
+            return new ApiProblem(403, "Access denied for this user.");
+        }
+
         $hydrator = new ObjectProperty();
         $data = $hydrator->extract($data);
 
@@ -38,6 +46,11 @@ class ProductsResource extends AbstractResourceListener
      */
     public function delete($id)
     {
+        $user = $this->usersRepository->findByUsername($this->getIdentity()->getRoleId());
+        if ($user->getRole() != "admin") {
+            return new ApiProblem(403, "Access denied for this user.");
+        }
+
         $this->repository->delete($id);
 
         return true;
@@ -108,6 +121,11 @@ class ProductsResource extends AbstractResourceListener
      */
     public function update($id, $data)
     {
+        $user = $this->usersRepository->findByUsername($this->getIdentity()->getRoleId());
+        if ($user->getRole() != "admin") {
+            return new ApiProblem(403, "Access denied for this user.");
+        }
+
         $hydrator = new ObjectProperty();
         $data = $hydrator->extract($data);
 

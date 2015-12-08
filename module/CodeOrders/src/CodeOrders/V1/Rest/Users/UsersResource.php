@@ -61,6 +61,11 @@ class UsersResource extends AbstractResourceListener
      */
     public function fetch($id)
     {
+        $user = $this->repository->findByUsername($this->getIdentity()->getRoleId());
+        if ($user->getRole() == "salesman") {
+            return new ApiProblem(403, "Access denied for this user.");
+        }
+
         return $this->repository->find($id);
     }
 
@@ -72,6 +77,11 @@ class UsersResource extends AbstractResourceListener
      */
     public function fetchAll($params = array())
     {
+        $user = $this->repository->findByUsername($this->getIdentity()->getRoleId());
+        if ($user->getRole() == "salesman") {
+            return new ApiProblem(403, "Access denied for this user.");
+        }
+
         return $this->repository->findAll();
     }
 
