@@ -23,8 +23,9 @@ class UsersRepositoryFactory implements FactoryInterface
         //$hydrator = new HydratingResultSet($usersMapper, new UsersEntity());
         $hydrator = new HydratingResultSet(new ClassMethods(), new UsersEntity());
         $tableGateway = new TableGateway('oauth_users', $dbAdapter, null, $hydrator);
+        $auth = $serviceLocator->get('api-identity');
 
-        $usersRepository = new UsersRepository($tableGateway);
+        $usersRepository = new UsersRepository($tableGateway, $auth);
 
         return $usersRepository;
     }

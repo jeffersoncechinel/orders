@@ -589,6 +589,7 @@ return array(
             'CodeOrders\\V1\\Rest\\Orders\\OrdersService' => 'CodeOrders\\V1\\Rest\\Orders\\OrdersServiceFactory',
             'CodeOrders\\V1\\Rest\\Clients\\ClientsResource' => 'CodeOrders\\V1\\Rest\\Clients\\ClientsResourceFactory',
             'CodeOrders\\V1\\Rest\\Clients\\ClientsRepository' => 'CodeOrders\\V1\\Rest\\Clients\\ClientsRepositoryFactory',
+            'CodeOrders\\V1\\Rest\\Clients\\ClientsTableGateway' => 'CodeOrders\\V1\\Rest\\Clients\\ClientsTableGatewayFactory',
         ),
     ),
     'zf-mvc-auth' => array(

@@ -22,11 +22,13 @@ class OrdersRepository
      * @var TableGatewayInterface
      */
     private $orderItemTableGateway;
+    private $clientsTableGateway;
 
-    public function __construct(TableGatewayInterface $tableGateway, TableGatewayInterface $orderItemTableGateway)
+    public function __construct(TableGatewayInterface $tableGateway, TableGatewayInterface $orderItemTableGateway, TableGatewayInterface $clientsTableGateway)
     {
         $this->tableGateway = $tableGateway;
         $this->orderItemTableGateway = $orderItemTableGateway;
+        $this->clientsTableGateway = $clientsTableGateway;
     }
 
     public function findAll()
@@ -39,7 +41,7 @@ class OrdersRepository
         foreach ($orders as $order) {
             $items = $this->orderItemTableGateway->select(['order_id' => $order->getId()]);
             foreach ($items as $item) {
-                $order->addItems($item);
+                $order->addItem($item);
             }
 
             $data = $hydrator->extract($order);
@@ -56,7 +58,32 @@ class OrdersRepository
     {
         $resultSet = $this->tableGateway->select(['id' => (int)$id]);
 
-        return $resultSet->current();
+        if ($resultSet->count() == 1) {
+            $hydrator = new ClassMethods();
+            $hydrator->addStrategy('items', new OrderItemHydratorStrategy(new ClassMethods()));
+            $order = $resultSet->current();
+
+            $client = $this->clientsTableGateway->select(['id' => $order->getClientId()])->current();
+            $sql = $this->orderItemTableGateway->getSql();
+            $select = $sql->select();
+            $select->join('products', 'order_items.product_id = products.id',
+                ['product_name' => 'name'])
+                ->where(['order_id' => $order->getId()]);
+
+            $items = $this->orderItemTableGateway->selectWith($select);
+            $order->setClient($client);
+
+            foreach ($items as $item) {
+                $order->addItem($item);
+            }
+
+            $data = $hydrator->extract($order);
+            return $data;
+
+        }
+
+        return false;
+        //return $resultSet->current();
     }
 
     public function delete($id)

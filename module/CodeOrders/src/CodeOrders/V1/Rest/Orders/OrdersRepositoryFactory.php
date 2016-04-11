@@ -22,7 +22,8 @@ class OrdersRepositoryFactory implements FactoryInterface
         $hydrator = new HydratingResultSet(new ClassMethods(), new OrdersEntity());
         $tableGateway = new TableGateway('orders', $dbAdapter, null, $hydrator);
         $orderItemTableGateway = $serviceLocator->get('CodeOrders\\V1\\Rest\\Orders\\OrderItemTableGateway');
-        $ordersRepository = new OrdersRepository($tableGateway, $orderItemTableGateway);
+        $clientTableGateway = $serviceLocator->get('CodeOrders\\V1\\Rest\\Clients\\ClientsTableGateway');
+        $ordersRepository = new OrdersRepository($tableGateway, $orderItemTableGateway, $clientTableGateway);
 
         return $ordersRepository;
     }

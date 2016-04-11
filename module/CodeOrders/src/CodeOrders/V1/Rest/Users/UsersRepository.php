@@ -10,15 +10,21 @@ namespace CodeOrders\V1\Rest\Users;
 
 use Zend\Db\TableGateway\TableGatewayInterface;
 use Zend\Paginator\Adapter\DbTableGateway;
+use ZF\MvcAuth\Identity\AuthenticatedIdentity;
 
 class UsersRepository
 {
 
     protected $tableGateway;
+    /**
+     * @var AuthenticatedIdentity
+     */
+    private $authenticatedIdentity;
 
-    public function __construct(TableGatewayInterface $tableGateway)
+    public function __construct(TableGatewayInterface $tableGateway, AuthenticatedIdentity $authenticatedIdentity)
     {
         $this->tableGateway = $tableGateway;
+        $this->authenticatedIdentity = $authenticatedIdentity;
     }
 
     public function findAll()
@@ -60,6 +66,12 @@ class UsersRepository
     public function findByUsername($username)
     {
         return $this->tableGateway->select(['username' => $username])->current();
+    }
+
+    public function getAuthenticated()
+    {
+        $username = $this->authenticatedIdentity->getAuthenticationIdentity()['user_id'];
+        return $this->findByUsername($username);
     }
 
 }

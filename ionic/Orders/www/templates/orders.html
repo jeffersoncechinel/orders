@@ -15,7 +15,7 @@
                    pulling-text="Solte para atualizar"
                    refreshing-text="Atualizando..">
     </ion-refresher>
-    <ion-list show-delete="data.showDelete" ng-repeat="order in orders | filter: search">
+    <ion-list show-delete="data.showDelete" ng-repeat="order in orders | filter: search" ng-click="show(order)">
         <ion-item>
             #{{order.id}} - Total: R$ {{order.total}} - {{order.created_at}}
             <ion-delete-button class="ion-minus-circled" ng-click="onOrderDelete(order);"></ion-delete-button>

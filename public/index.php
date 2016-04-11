@@ -47,5 +47,9 @@ if (isset($appConfig['module_listener_options']['config_glob_paths'])) {
     }
 }
 
+/*header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Authorization, Content-Type');*/
+
 // Run the application!
 ZF\Apigility\Application::init($appConfig)->run();
