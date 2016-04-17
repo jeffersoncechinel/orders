@@ -88,6 +88,7 @@ class OrdersRepository
 
     public function delete($id)
     {
+        $this->deleteItem($id);
         $result = $this->tableGateway->delete(['id' => (int)$id]);
 
         return $result;
@@ -114,6 +115,14 @@ class OrdersRepository
         $id = $this->orderItemTableGateway->getLastInsertValue();
 
         return $id;
+    }
+
+    public function deleteItem($id)
+    {
+        //Eu tinha feito delete on cascade no banco anteriormente. Por isso não tinha implementado esse metodo aqui.
+        $result = $this->orderItemTableGateway->delete(['order_id' => (int)$id]);
+
+        return $result;
     }
 
     public function findOneByUserId($user_id, $id)
