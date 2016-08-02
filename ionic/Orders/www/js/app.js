@@ -19,6 +19,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
             }
         });
 
+        $rootScope.expiredMsg = '';
+
         $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
             if (toState.name != 'login') {
                 //console.log('acessando '+ toState.name);
@@ -31,6 +33,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
 
         $rootScope.$on('oauth:error', function (event, data) {
             if (data.rejection.statusText === 'invalid_grant') {
+                $rootScope.expiredMsg = 'oi';
                 return;
             }
 

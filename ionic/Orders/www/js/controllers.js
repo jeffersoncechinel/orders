@@ -151,40 +151,53 @@ angular.module('starter.controllers', [])
         }
     ])
 
-    .controller('LogoutCtrl', ['$scope', 'OAuthToken', '$state', '$ionicHistory',
-        function ($scope, OAuthToken, $state, $ionicHistory) {
+    .controller('LogoutCtrl', ['$scope', 'logout',
+        function ($scope, logout) {
             $scope.logout = function () {
-                OAuthToken.removeToken();
-                $ionicHistory.clearCache();
-                $ionicHistory.clearHistory();
-                $ionicHistory.nextViewOptions({
-                    disabledBack: true,
-                    historyRoot: true
-                })
+                logout.logout();
                 $state.go('login');
             }
         }
     ])
 
-    .controller('RefreshModalCtrl', ['$rootScope', '$scope', 'OAuth', 'authService', '$timeout', function ($rootScope, $scope, OAuth, authService, $timeout) {
+    .controller('RefreshModalCtrl', ['$rootScope', '$scope', 'OAuth', 'authService', '$timeout', 'OAuthToken', 'logout',
+        function ($rootScope, $scope, OAuth, authService, $timeout, $OAuthToken, logout) {
 
-        function destroyModal() {
-            if ($rootScope.modal) {
-                $rootScope.modal.hide();
-                $rootScope.modal = false;
+            function destroyModal() {
+                if ($rootScope.modal) {
+                    $rootScope.modal.hide();
+                    $rootScope.modal = false;
+                }
             }
-        }
 
-        $scope.$on('event:auth-loginConfirmed', function () {
-            destroyModal();
-        });
+            $scope.$on('event:auth-loginConfirmed', function () {
+                destroyModal();
+            });
 
-        OAuth.getRefreshToken().then(function () {
-            $timeout(function () {
-                authService.loginConfirmed();
-            }, 1000)
-        }, function () {
+            $scope.$on('event:auth-loginCancelled', function () {
+                destroyModal();
+                logout.logout();
+            });
 
-        });
+            $scope.$on('$stateChangeStart',
+                function (event, toState, toParams, fromState, fromParams) {
+                    if ($rootScope.modal) {
+                        authService.loginCancelled();
+                        event.preventDefault();
+                        logout.logout();
+                    }
+                });
 
-    }]);
+            OAuth.getRefreshToken().then(function () {
+                //sucesso
+                $timeout(function () {
+                    authService.loginConfirmed();
+                }, 1000)
+            }, function () {
+                //fracasso
+                $rootScope.expiredMsg = 'Sua autenticação expirou!';
+                authService.loginCancelled();
+                $state.go('login');
+            });
+
+        }]);

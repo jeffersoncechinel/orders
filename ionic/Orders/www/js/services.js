@@ -25,16 +25,32 @@ angular.module('starter.services', [])
                     $rootScope.$emit("oauth:error", {rejection: rejection, deferred: deferred});
                     return deferred.promise;
                 }
-               return $q.reject(rejection);
+                return $q.reject(rejection);
 
 
                 //Testing only
-               /* var deffered = $q.defer() //Defer means (adiar nossa decisão)
-                deffered.resolve({nome: 'Jeff'});
-                return deffered.promise;
-                */
+                /* var deffered = $q.defer() //Defer means (adiar nossa decisão)
+                 deffered.resolve({nome: 'Jeff'});
+                 return deffered.promise;
+                 */
                 //return $q.reject(rejection); //Reject
                 // return $q.resolve({nome: 'Jeff'}); //Treat the error and response as success
             }
         };
     }])
+    .service('logout', ['OAuthToken', '$state', '$ionicHistory',
+        function (OAuthToken, $state, $ionicHistory) {
+            return {
+                logout: function () {
+                    OAuthToken.removeToken();
+                    $ionicHistory.clearCache();
+                    $ionicHistory.clearHistory();
+                    $ionicHistory.nextViewOptions({
+                        disabledBack: true,
+                        historyRoot: true
+                    })
+                    $state.go('login');
+                }
+            };
+        }
+    ])
